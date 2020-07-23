@@ -29,30 +29,31 @@
       return tableEl;
     };
 
-    const x =() => {
-      const puzlle = generatePlayingField();
-      const gameField = document.querySelector('.gem-puzzle');
-      gameField.append(puzlle);
-      gameField.addEventListener('click', (el) => {
-        const currentActive = puzlle.querySelector('.table-active');
-        const a = {
-          x: currentActive.cellIndex,
-          y: currentActive.parentElement.rowIndex,
-        };
-        const b = {
-          x: el.target.cellIndex,
-          y: el.target.parentElement.rowIndex,
-        };
-        const distance = Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-        if (distance === 1) {
-          currentActive.classList.remove('table-active');
-          el.target.classList.add('table-active');
-          const n = el.target.textContent;
-          el.target.textContent = '';
-          currentActive.textContent = n;
+    const getDistance = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+
+    const play = () => {
+      let currentPosition = { x: 3, y: 3 };
+      const tableEl = generatePlayingField();
+
+      tableEl.addEventListener('click', (e) => {
+        const cell = e.target;
+        const { cellIndex, parentElement: { rowIndex } } = cell;
+        const newPosition = { y: rowIndex, x: cellIndex };
+        const distance = getDistance(currentPosition, newPosition);
+        if (distance !== 1) {
+          return;
         }
+        const point = tableEl.rows[currentPosition.y].cells[currentPosition.x];
+        point.textContent = cell.textContent;
+        point.classList.remove('table-active');
+        cell.textContent = '';
+        cell.classList.add('table-active');
+        currentPosition = { x: cellIndex, y: rowIndex };
       });
+
+      const root = document.querySelector('.gem-puzzle');
+      root.append(tableEl);
     };
-    x();
+    play();
   </script>
 </body>
